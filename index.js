@@ -9,6 +9,7 @@ const cors = require("cors");
 // const staticAyushRoutes = require("./routes-ayush/static.routes");
 // const blogAyushRoutes = require("./routes-ayush/blogs.routes");
 // const { hash, verifyHash } = require("./utils/index");
+const DB = require("./utils/db");
 
 app.use(cors());
 require("dotenv").config();
@@ -30,6 +31,12 @@ app.get("/", (req, res) => {
   res.json({ Message: "Welcome to the Gemma API" });
 });
 
+app.post("/", (req, res) => {
+  console.log(req.body);
+  const data = { ...req.body, pk: "test", sk: "test" };
+  DB.put(data, process.env.TABLE_NAME);
+  res.json({ Message: "Data Added Successfully", data: data, status: 200 });
+});
 // app.get("/hash", async (req, res) => {
 //   // const password = "password";
 //   const token = process.env.TOKEN;
