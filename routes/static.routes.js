@@ -1,6 +1,6 @@
 const Router = require("express").Router;
 const router = Router();
-const DB = require("../utils/Dynamo");
+const DB = require("../utils/db");
 const crypto = require("crypto");
 const TableName = process.env.TABLE_NAME;
 const validateEndpoint = require("../middlewares/validateEndpoint");

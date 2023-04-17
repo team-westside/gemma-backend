@@ -1,13 +1,6 @@
 const validateEndpoint = async (req, res, next) => {
   try {
-    const allowed_endpoints = [
-      "resume",
-      "about",
-      "skills",
-      "socials",
-      "projects",
-      "certifications",
-    ];
+    const allowed_endpoints = ["static", "user"];
     console.log(req.url);
     const url = req.url.split("/")[2];
     if (!allowed_endpoints.includes(url)) {

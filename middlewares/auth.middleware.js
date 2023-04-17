@@ -1,6 +1,7 @@
 const { authenticate, Response } = require("../utils/index.js");
 async function isAuthenticated(req, res, next) {
   try {
+    // next();
     const token = req.headers.authorization;
     if (!token) {
       return res.status(401).json(Response(401, "Unauthorized"));
