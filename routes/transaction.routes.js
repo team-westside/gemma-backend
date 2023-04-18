@@ -29,8 +29,8 @@ router.get("/transactions", async (req, res) => {
 router.post("/transaction", isAuthenticated, async (req, res) => {
   try {
     const id = crypto.randomBytes(4).toString("hex");
-    const { productId, transactionId, from, to } = req.body;
-    if (!productId || !transactionId || !from || !to) {
+    const { productId, transactionId, from, to, hex_value, hash } = req.body;
+    if (!productId || !transactionId || !from || !to || !hash) {
       return res.status(400).json({ message: "Missing Parameters!!" });
     }
     const params = {
@@ -41,6 +41,8 @@ router.post("/transaction", isAuthenticated, async (req, res) => {
       from,
       to,
       id,
+      hex_value,
+      hash,
       created: Date.now(),
     };
     await DB.put(params, process.env.TABLE_NAME);
@@ -62,4 +64,37 @@ router.post("/transaction", isAuthenticated, async (req, res) => {
   }
 });
 
+// get all transactions of a user
+router.get("/transactions/:address", async (req, res) => {
+  try {
+    const { address } = req.params;
+    const data = await DB.queryBeginsWith(
+      UserName,
+      "transaction",
+      process.env.TABLE_NAME
+    );
+    const filteredData = data.filter(
+      (item) =>
+        String(item.from).toLowerCase() == String(address).toLowerCase() ||
+        String(item.to).toLowerCase() == String(address).toLowerCase()
+    );
+    if (
+      String(address).toLowerCase() ==
+      String(process.env.OWNER_ADDRESS).toLowerCase()
+    ) {
+      return res.status(200).json(data);
+    } else {
+      return res.status(200).json(filteredData);
+    }
+  } catch (err) {
+    return res.status(400).json(err);
+  }
+});
+
 module.exports = router;
+
+// https://api.etherscan.io/api?module=account&action=txlistinternal&txhash=0x9d0a7161238e7ec3060cda2cf011657d22da10a0082283a4746d15a057638b6a&apikey=3DZFTR77Q56BK8G7VBKIX3G7H2JRQNR9S1
+
+// https://api-sepolia.etherscan.io/api?module=transaction&action=gettxreceiptstatus&txhash=0x9d0a7161238e7ec3060cda2cf011657d22da10a0082283a4746d15a057638b6a&apikey=3DZFTR77Q56BK8G7VBKIX3G7H2JRQNR9S1
+
+// https://api-sepolia.etherscan.io/api?module=account&action=txlistinternal&txhash=0x9d0a7161238e7ec3060cda2cf011657d22da10a0082283a4746d15a057638b6a&apikey=3DZFTR77Q56BK8G7VBKIX3G7H2JRQNR9S1

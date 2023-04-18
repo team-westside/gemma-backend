@@ -200,7 +200,7 @@ router.post("/product/batch", isAuthenticated, async (req, res) => {
 });
 
 // get product by owner
-router.get("/product/owner/:id", async (req, res) => {
+router.get("/products/owner/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const data = await DB.queryBeginsWith(
@@ -208,8 +208,31 @@ router.get("/product/owner/:id", async (req, res) => {
       `product#`,
       process.env.TABLE_NAME
     );
+    console.log(id);
     const availableProducts = data.filter(
-      (product) => product.productOwnerAddress == id
+      (product) =>
+        String(product.productOwnerAddress).toLowerCase() ==
+        String(id).toLowerCase()
+    );
+    return res.status(200).json(availableProducts);
+  } catch (err) {
+    return res.status(400).json(err);
+  }
+});
+
+// search products based on keywords
+router.get("/products/search/:keyword", async (req, res) => {
+  try {
+    const { keyword } = req.params;
+    const data = await DB.queryBeginsWith(
+      UserName,
+      "product",
+      process.env.TABLE_NAME
+    );
+    const keywords = keyword.split("+").join(" ");
+    console.log(keyword);
+    const availableProducts = data.filter((product) =>
+      product.productName.toLowerCase().includes(keywords.toLowerCase())
     );
     return res.status(200).json(availableProducts);
   } catch (err) {
